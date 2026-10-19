@@ -45,11 +45,11 @@ export class TannerScene {
     const variable = Array.from({ length: code.n }, (_, i) => {
       const columns = Math.ceil(code.n / 3), col = i % columns, row = Math.floor(i / columns);
       const x = (col / (columns - 1) - .5) * 2.05, z = (row - 1) * .62;
-      return { ...project(x, -.48 - .04 * Math.cos(i), z), id: 'v-' + i, kind: 'v', index: i, r: Math.max(3.8, code.n === 24 ? 7.4 : code.n === 48 ? 5.2 : 3.8) };
+      return { ...project(x, -.48 - .04 * Math.cos(i), z), id: 'v-' + i, kind: 'v', index: i, r: code.n === 24 ? 10 : code.n === 48 ? 7 : 5 };
     });
     const check = Array.from({ length: code.m }, (_, i) => {
       const columns = Math.ceil(code.m / 2), col = i % columns, row = Math.floor(i / columns);
-      return { ...project((col / (columns - 1) - .5) * 1.8, .54, (row - .5) * .9), id: 'c-' + i, kind: 'c', index: i, r: code.n === 24 ? 6.8 : 4.8 };
+      return { ...project((col / (columns - 1) - .5) * 1.8, .54, (row - .5) * .9), id: 'c-' + i, kind: 'c', index: i, r: code.n === 24 ? 9 : 6 };
     });
     const selected = this.selected ?? this.hovered;
     let selectedEdges = [];
@@ -77,22 +77,22 @@ export class TannerScene {
         const gradient = c.createRadialGradient(p.x - radius * .35, p.y - radius * .45, 0, p.x, p.y, radius);
         gradient.addColorStop(0, error ? '#edc9aa' : '#e1ecd0'); gradient.addColorStop(.5, error ? '#c99574' : '#a6bd87'); gradient.addColorStop(1, error ? '#9f6b4f' : '#6c8853');
         c.beginPath(); c.arc(p.x, p.y, radius, 0, Math.PI * 2); c.fillStyle = gradient; c.shadowColor = '#62744525'; c.shadowBlur = 5; c.shadowOffsetY = 2; c.fill(); c.shadowBlur = 0; c.shadowOffsetY = 0;
-        if (code.n <= 48) { c.font = `${Math.max(6, radius * .95)}px 'DM Mono',monospace`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = error ? '#805039' : '#52663d'; c.fillText(frame.bits[p.index], p.x, p.y + .5); }
+        if (code.n <= 48) { c.font = `${Math.max(10, radius * 1.1)}px 'DM Mono',monospace`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = error ? '#743e27' : '#414c29'; c.fillText(frame.bits[p.index], p.x, p.y + .5); }
       } else {
         c.save(); c.translate(p.x, p.y); c.rotate(-.08 + this.angle * .06); c.fillStyle = error ? '#c39372' : '#c2b299'; c.strokeStyle = error ? '#a26d4d' : '#aa997e'; c.lineWidth = .65; c.fillRect(-radius, -radius * .8, radius * 2, radius * 1.6); c.strokeRect(-radius, -radius * .8, radius * 2, radius * 1.6); c.fillStyle = '#efe7d7b0'; c.fillRect(-radius + 1, -radius * .8 + 1, radius * 2 - 2, 2); c.restore();
       }
-      if (code.n === 24 && (p.index % (p.kind === 'v' ? 4 : 3) === 0 || active)) { c.font = "italic 10px 'Instrument Serif',Georgia"; c.textAlign = 'center'; c.fillStyle = error ? '#a27b5b' : '#8b9b77'; c.fillText((p.kind === 'v' ? 'x' : 'c') + (p.index + 1), p.x, p.y + radius + 12); }
+      if (code.n === 24 && (p.index % (p.kind === 'v' ? 4 : 3) === 0 || active)) { c.font = "italic 17px 'Instrument Serif',Georgia"; c.textAlign = 'center'; c.fillStyle = error ? '#925435' : '#606a3a'; c.fillText((p.kind === 'v' ? 'x' : 'c') + (p.index + 1), p.x, p.y + radius + 17); }
       c.globalAlpha = 1;
     });
   }
   matrix(code, frame) {
     const c = this.ctx, cell = Math.min((this.w - 70) / code.n, (this.h - 165) / code.m, 18), width = cell * code.n, height = cell * code.m, left = (this.w - width) / 2, top = (this.h - height) / 2 + 6;
     code.H.forEach((row, j) => row.forEach((value, i) => {
-      c.fillStyle = value ? (frame.syndrome[j] ? '#bd8c68' : '#7f9b65') : '#e6e9dc'; c.beginPath(); c.roundRect(left + i * cell + 1, top + j * cell + 1, cell - 2, cell - 2, Math.min(2, cell / 4)); c.fill();
+      c.fillStyle = value ? (frame.syndrome[j] ? '#af643c' : '#65713f') : '#d3c6a3'; c.beginPath(); c.roundRect(left + i * cell + 1, top + j * cell + 1, cell - 2, cell - 2, Math.min(2, cell / 4)); c.fill();
       this.points.push({ id: `c-${j}`, x: left + i * cell + cell / 2, y: top + j * cell + cell / 2, r: cell / 2 });
     }));
     c.strokeStyle = '#a4b190'; c.lineWidth = 1;
     for (const x of [left - 8, left + width + 8]) { const dir = x < left ? 1 : -1; c.beginPath(); c.moveTo(x + dir * 5, top); c.lineTo(x, top); c.lineTo(x, top + height); c.lineTo(x + dir * 5, top + height); c.stroke(); }
-    c.font = "9px 'DM Mono',monospace"; c.textAlign = 'center'; c.fillStyle = '#8c9b79'; c.fillText(`${code.m} × ${code.n}  ·  ${(300 / code.m).toFixed(1)}% nonzero  ·  rank ${code.n - code.k}`, this.w / 2, top + height + 23);
+    c.font = `${this.w < 390 ? 12 : 14}px 'DM Mono',monospace`; c.textAlign = 'center'; c.fillStyle = '#665c4d'; c.fillText(`${code.m} × ${code.n}  ·  ${(300 / code.m).toFixed(1)}% nonzero  ·  rank ${code.n - code.k}`, this.w / 2, top + height + 28);
   }
 }

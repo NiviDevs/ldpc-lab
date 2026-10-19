@@ -162,7 +162,7 @@ document.addEventListener('keydown',e=>{
   if(e.code==='Space'){e.preventDefault();play();}
 });
 window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(drawPlots,120);});
-document.fonts.ready.then(drawPlots);
+document.fonts.ready.then(()=>drawPlots());
 runExperiment();startSimulation();
 // Read-only hooks for reproducible browser checks and seminar inspection.
 window.ldpcLab={getState:()=>({...state,playing:state.playing}),setTab};

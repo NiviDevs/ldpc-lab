@@ -2,3 +2,10 @@ node_modules/
 .DS_Store
 artifacts/
 *.zip
+/.codegraph/
+/.projectmem/
+
+.projectmem/events.jsonl
+.projectmem/watch.pid
+.projectmem/watch.log
+.projectmem/structure.json

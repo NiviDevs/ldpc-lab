@@ -8,7 +8,7 @@ pptx.author = 'The Signal Lab'; pptx.subject = 'Digital Communication Systems ·
 pptx.title = 'LDPC Codes and Their Application in Modern Communication Systems';
 pptx.company = 'DCS Seminar'; pptx.lang = 'en-IN';
 pptx.theme = { headFontFace:'Georgia', bodyFontFace:'Aptos', lang:'en-IN' };
-const C={paper:'F6F4ED',ink:'29372E',green:'4C7158',muted:'88967B',line:'DDE1D3',copper:'BA7758'};
+const C={paper:'E5D7B7',ink:'3C3836',green:'65713F',muted:'756B59',line:'C6B996',copper:'AF643C'};
 const text=(slide,t,x,y,w,h,size=16,color=C.ink,more={})=>slide.addText(t,{x,y,w,h,fontFace:'Aptos',fontSize:size,color,margin:0,breakLine:false,paraSpaceAfterPt:0,vertAnchor:'top',...more});
 const line=(slide,x1,y1,x2,y2,color=C.line,width=.7)=>slide.addShape(pptx.ShapeType.line,{x:x1,y:y1,w:x2-x1,h:y2-y1,line:{color,width,beginArrowType:'none',endArrowType:'none'}});
 function picture(slide,name,x,y,w,h){

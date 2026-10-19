@@ -1,6 +1,6 @@
 # LDPC · The Signal Lab
 
-A cream-themed digital communication seminar and interactive laboratory. The browser app uses local fonts, Canvas graphics, and native Web Workers. It makes no external runtime requests.
+A warm, Gruvbox-inspired digital communication seminar and interactive laboratory, with large text and charts for projection. The browser app uses local fonts, Canvas graphics, and native Web Workers. It makes no external runtime requests.
 
 ## Run
 
@@ -9,6 +9,12 @@ npm run dev
 ```
 
 Open http://localhost:4173. Node 20 or later is recommended. The static app needs an HTTP server because its simulation uses JavaScript modules and a Web Worker; do not double-click `index.html`.
+
+## Deploy on Vercel
+
+The complete source is local in this directory. Vercel hosts a separate online copy.
+
+Import this directory's Git repository into Vercel, or run `npx vercel` from this directory and sign in. The included `vercel.json` selects **Other** as the framework, serves `dist`, and skips installation and building. No environment variables or backend are needed. If importing a parent repository, set the Vercel Root Directory to `DCS_Presentation/ldpc-lab`.
 
 ## Present
 

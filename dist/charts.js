@@ -1,21 +1,22 @@
 import { binaryCapacity, capacityThreshold, countErrors } from './codec.js';
-const green = '#72905c', copper = '#be8562', grey = '#a9af9b', ink = '#8f9a81';
+const green = '#65713f', copper = '#af643c';
 function context(canvas) {
   const rect = canvas.getBoundingClientRect(), dpr = Math.min(devicePixelRatio, 2), w = rect.width, h = rect.height;
   canvas.width = w * dpr; canvas.height = h * dpr;
-  const c = canvas.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.font = "8px 'DM Mono',monospace"; c.lineJoin = 'round';
-  return { c, w, h, left: 37, right: w - 14, top: 24, bottom: h - 28 };
+  const c = canvas.getContext('2d'), fontSize = w < 390 ? 12 : 14;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.font = `${fontSize}px 'DM Mono',monospace`; c.lineJoin = 'round';
+  return { c, w, h, fontSize, left: 56, right: w - 18, top: 34, bottom: h - 48 };
 }
 function axes(p, { xmin, xmax, ymin, ymax, xticks, yticks, log = false, xlabel, ylabel }) {
   const { c, left: l, right: r, top: t, bottom: b, w, h } = p;
   const xx = x => l + (x - xmin) / (xmax - xmin) * (r - l), yy = y => b - ((log ? Math.log10(y) - Math.log10(ymin) : y - ymin) / (log ? Math.log10(ymax) - Math.log10(ymin) : ymax - ymin)) * (b - t);
-  c.lineWidth = .65; c.strokeStyle = '#e7eadf'; c.fillStyle = '#a0a991'; c.textAlign = 'right'; c.textBaseline = 'middle';
+  c.lineWidth = .8; c.strokeStyle = '#ccbf9e'; c.fillStyle = '#756b59'; c.textAlign = 'right'; c.textBaseline = 'middle';
   for (const [value, label] of yticks) { const y = yy(value); c.beginPath(); c.moveTo(l, y); c.lineTo(r, y); c.stroke(); c.fillText(label, l - 8, y); }
   c.textAlign = 'center';
-  for (const [value, label] of xticks) { const x = xx(value); c.fillText(label, x, b + 12); }
-  c.fillStyle = '#919e81'; c.font = "7px 'DM Mono',monospace"; c.fillText(xlabel, (l + r) / 2, h - 3);
-  c.textAlign = 'left'; c.fillText(ylabel, l, 11);
-  c.save(); c.strokeStyle = '#d9dece'; c.lineWidth = .8; c.beginPath(); c.moveTo(l, t); c.lineTo(l, b); c.lineTo(r, b); c.stroke(); c.restore();
+  for (const [value, label] of xticks) { const x = xx(value); c.fillText(label, x, b + 19); }
+  c.fillStyle = '#665c4d'; c.font = `${p.fontSize}px 'DM Mono',monospace`; c.fillText(xlabel, (l + r) / 2, h - 9);
+  c.textAlign = 'left'; c.fillText(ylabel, l, 15);
+  c.save(); c.strokeStyle = '#b8aa88'; c.lineWidth = 1; c.beginPath(); c.moveTo(l, t); c.lineTo(l, b); c.lineTo(r, b); c.stroke(); c.restore();
   return { xx, yy };
 }
 function path(c, points, color, dashed = false, width = 1.5) {
@@ -28,7 +29,7 @@ export function drawSignal(canvas, experiment) {
   const ticks = [...new Set([1, Math.round(n / 4), Math.round(n / 2), Math.round(3 * n / 4), n])];
   const { xx, yy } = axes(p, { xmin: 0, xmax: n - 1, ymin: -bound, ymax: bound, xticks: ticks.map(i => [i - 1, String(i)]), yticks: [[-bound, String(-bound)], [-1, '−1'], [0, '0'], [1, '+1'], [bound, '+' + bound]].filter((a,i,arr)=>arr.findIndex(b=>b[0]===a[0])===i), xlabel: 'TRANSMITTED BIT', ylabel: 'AMPLITUDE' });
   const sent = []; word.forEach((bit, i) => { if (i) sent.push([xx(i - .5), yy(1 - 2 * word[i - 1])]); sent.push([xx(i ? i - .5 : 0), yy(1 - 2 * bit)]); sent.push([xx(i === n - 1 ? i : i + .5), yy(1 - 2 * bit)]); });
-  path(c, sent, '#bcc9a6', true, 1);
+  path(c, sent, '#8c9164', true, 1.5);
   path(c, channel.received.map((y, i) => [xx(i), yy(y)]), copper, false, 1.2);
   channel.received.forEach((y, i) => dot(c, xx(i), yy(y), (y < 0 ? 1 : 0) !== word[i] ? '#b46e50' : '#bd9174', 1.8));
 }
@@ -52,7 +53,7 @@ export function drawBER(canvas, experiment, data) {
   const threshold = capacityThreshold(experiment.code.rate);
   c.fillStyle = '#dee5d435'; c.fillRect(p.left, p.top, xx(threshold) - p.left, p.bottom - p.top);
   path(c, [[xx(threshold), p.top],[xx(threshold), p.bottom]], '#bdc6ac', true, 1);
-  c.save(); c.font = "7px 'DM Mono',monospace"; c.fillStyle = '#9aa88a'; c.textAlign = 'left'; c.fillText('CAPACITY', xx(threshold) + 4, p.top + 9); c.restore();
+  c.save(); c.font = `${p.fontSize - 1}px 'DM Mono',monospace`; c.fillStyle = '#756b59'; c.textAlign = 'left'; c.fillText('CAPACITY', xx(threshold) + 5, p.top + 14); c.restore();
   if (data.length) {
     const raw = data.map(d => [xx(d.ebn0), yy(Math.max(.0001, d.rawErrors / d.totalBits))]);
     const decoded = data.map(d => [xx(d.ebn0), yy(Math.max(.0001, (d.decodedErrors || 1) / d.totalBits))]);
@@ -61,7 +62,7 @@ export function drawBER(canvas, experiment, data) {
       if (d.decodedErrors) dot(c, ...decoded[i], green, 2.3);
       else { const [x,y] = decoded[i]; c.strokeStyle = green; c.lineWidth = 1; c.beginPath(); c.moveTo(x,y-4); c.lineTo(x,y+3); c.moveTo(x-2,y+1); c.lineTo(x,y+3); c.lineTo(x+2,y+1); c.stroke(); }
     });
-  } else { c.font = "9px 'DM Mono',monospace"; c.fillStyle = '#9ba58c'; c.textAlign = 'center'; c.fillText('SIMULATING IN THE BACKGROUND…', (p.left + p.right) / 2, (p.top + p.bottom) / 2); }
+  } else { c.fillStyle = '#756b59'; c.textAlign = 'center'; c.fillText('SIMULATING…', (p.left + p.right) / 2, (p.top + p.bottom) / 2); }
   path(c, [[xx(experiment.ebn0), p.top], [xx(experiment.ebn0), p.bottom]], '#c99b7744', true, 1);
 }
 export function drawCapacity(canvas, experiment) {
