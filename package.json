@@ -1,0 +1,13 @@
+{
+  "name": "ldpc-signal-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "deck": "node scripts/make-deck.mjs"
+  },
+  "devDependencies": { "pptxgenjs": "^4.0.1" },
+  "overrides": { "image-size": "^2.0.3" }
+}
